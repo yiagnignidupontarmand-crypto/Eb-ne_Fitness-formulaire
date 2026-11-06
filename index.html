@@ -178,6 +178,9 @@ $('#f').addEventListener('submit',async e=>{e.preventDefault();const f=e.target,
 const d={nom:f.nom.value.trim(),whatsapp:f.whatsapp.value.trim(),quartier:f.quartier.value.trim(),age:f.age.value,frequence:(f.frequence.value||''),presence:f.presence.value,attrait:[...f.querySelectorAll('[name=attrait]:checked')].map(c=>c.value).join(', '),prix:f.prix.value,suggestions:f.suggestions.value.trim()};
 if(!SHEET_URL){m.style.color='#ff8a8a';m.textContent='Configuration manquante : SHEET_URL est vide.';return}
 const b=f.querySelector('.sb');b.disabled=true;m.style.color='#fff';m.textContent='Envoi en cours…';
-try{await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)});m.style.color='#8dffb0';m.textContent='Merci ! Vos réponses sont bien enregistrées. À très vite à la Gym Night XXL !';f.reset()}
-catch(err){m.style.color='#ff8a8a';m.textContent='Échec de l’envoi. Vérifiez votre connexion et réessayez.'}b.disabled=false});
+try{let r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)});const tx=(await r.text()).trim();
+if(tx==='ok'){m.style.color='#8dffb0';m.textContent='Merci ! Vos réponses sont bien enregistrées. À très vite à la Gym Night XXL !';f.reset()}
+else{m.style.color='#ff8a8a';m.textContent='Le script Google a répondu une erreur. Vérifiez Code.gs et le déploiement (Exécutions).';console.log(tx.slice(0,300))}}
+catch(err){try{await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)});m.style.color='#ffd37a';m.textContent='Envoyé, mais non confirmé. Vérifiez le Sheet.'}catch(e2){m.style.color='#ff8a8a';m.textContent='Échec de l’envoi. Vérifiez votre connexion et réessayez.'}}
+b.disabled=false});
 </script></body></html>
